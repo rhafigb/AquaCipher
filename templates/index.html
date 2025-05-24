@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaCipher: Digital Watermarking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+            animation: waterFlow 15s infinite linear;
+        }
+        
+        @keyframes waterFlow {
+            0% { transform: rotate(30deg) translate(0, 0); }
+            100% { transform: rotate(30deg) translate(-50px, 50px); }
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .hero {
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            animation: fadeIn 1s ease;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            animation: fadeIn 1.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: white;
+            color: var(--primary-color);
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-accent {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        section {
+            padding: 4rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-size: 2rem;
+            color: var(--dark-color);
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+        
+        .tab-container {
+            margin-bottom: 2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 1.5rem 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .watermarking-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        
+        .upload-area, .result-area {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .dropzone {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 1rem;
+        }
+        
+        .dropzone:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .dropzone.active {
+            border-color: var(--secondary-color);
+            background-color: rgba(46, 204, 113, 0.05);
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+        
+        .radio-option input {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+        
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        
+        .checkbox-option input {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .metrics {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .metric-card {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .result-box {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+        
+        .team-members {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+        
+        .team-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            text-align: center;
+            width: 300px;
+            transition: var(--transition);
+        }
+        
+        .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .team-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1rem;
+            border: 5px solid var(--light-color);
+        }
+        
+        .team-name {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+        
+        .team-role {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .social-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .copyright {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: var(--shadow);
+            background-color: white;
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .notification.error {
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .notification i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .watermarking-container {
+                flex-direction: column;
+            }
+            
+            .team-members {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .team-card {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+        /* Page-specific styles */
+        #home-page {
+            display: none;
+        }
+        
+        #watermarking-page {
+            display: none;
+        }
+        
+        #about-page {
+            display: none;
+        }
+        
+        .active-page {
+            display: block !important;
+            animation: fadeIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-water"></i>
+                    <span>AquaCipher</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#" class="nav-link" data-page="home">Home</a></li>
+                    <li><a href="#" class="nav-link" data-page="watermarking">Watermarking</a></li>
+                    <li><a href="#" class="nav-link" data-page="about">About Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Home Page -->
+        <section id="home-page">
+            <div class="hero">
+                <h1>AquaCipher: Digital Image Watermarking</h1>
+                <p>Protect your digital images with our advanced hybrid DWT-DCT and AES watermarking technology. Ensure authenticity and prevent unauthorized use of your valuable visual assets.</p>
+                <a href="#" class="btn btn-primary nav-link" data-page="watermarking">Try Watermarking</a>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Why Choose AquaCipher?</h2>
+                <p>AquaCipher combines the power of Discrete Wavelet Transform (DWT), Discrete Cosine Transform (DCT), and AES encryption to create robust, imperceptible watermarks that can withstand various image processing attacks while maintaining high image quality.</p>
+                
+                <div class="features" style="margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 1.5rem;">
+                    <div style="flex: 1; min-width: 250px;">
+                        <h3><i class="fas fa-shield-alt" style="color: var(--primary-color); margin-right: 10px;"></i> Robust Security</h3>
+                        <p>Our hybrid approach ensures watermarks are resilient to compression, cropping, and noise addition.</p>
+                    </div>
+                    <div style="flex: 1; min-width: 250px;">
+                        <h3><i class="fas fa-eye-slash" style="color: var(--primary-color); margin-right: 10px;"></i> Imperceptible</h3>
+                        <p>Watermarks are embedded in a way that's invisible to the human eye but detectable by our system.</p>
+                    </div>
+                    <div style="flex: 1; min-width: 250px;">
+                        <h3><i class="fas fa-bolt" style="color: var(--primary-color); margin-right: 10px;"></i> Fast Processing</h3>
+                        <p>Optimized algorithms provide quick watermark embedding and extraction without quality loss.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Watermarking Page -->
+        <section id="watermarking-page">
+            <div class="section-title">
+                <h2>Digital Watermarking</h2>
+                <p>Embed or extract watermarks from your images using advanced techniques</p>
+            </div>
+
+            <div class="tab-container">
+                <div class="tabs">
+                    <div class="tab active" data-tab="embed">Embed Watermark</div>
+                    <div class="tab" data-tab="extract">Extract Watermark</div>
+                </div>
+                
+                <div class="tab-content active" id="embed-tab">
+                    <div class="watermarking-container">
+                        <div class="upload-area card">
+                            <h3 class="card-title">Upload Image</h3>
+                            <div class="form-group">
+                                <div id="embed-dropzone" class="dropzone">
+                                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                                    <p>Drag & drop your image here or click to browse</p>
+                                    <input type="file" id="embed-file-input" accept="image/*" style="display: none;">
+                                    <img id="embed-preview-image" class="preview-image">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="watermark-type">Watermark Type</label>
+                                <select id="watermark-type" class="form-control">
+                                    <option value="text">Text Watermark</option>
+                                    <option value="image">Image Watermark</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="text-watermark-group">
+                                <label for="watermark-text">Watermark Text</label>
+                                <textarea id="watermark-text" rows="3" placeholder="Enter your watermark text"></textarea>
+                            </div>
+
+                            <div class="form-group" id="image-watermark-group" style="display: none;">
+                                <label for="watermark-image">Watermark Image</label>
+                                <input type="file" id="watermark-image" accept="image/*">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Watermarking Method</label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="method" value="dct" checked> DCT
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="method" value="dwt"> DWT
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="method" value="hybrid"> Hybrid
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="use-aes" checked>
+                                <label for="use-aes">Encrypt watermark with AES</label>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button id="embed-btn" class="btn btn-primary">
+                                    <i class="fas fa-lock"></i> Embed Watermark
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="result-area card">
+                            <h3 class="card-title">Results</h3>
+                            <div class="spinner" id="embed-spinner"></div>
+                            
+                            <div id="embed-result" style="display: none;">
+                                <h4>Watermarked Image</h4>
+                                <img id="watermarked-image" class="preview-image" style="display: block; margin: 0 auto;">
+                                
+                                <div class="metrics" id="quality-metrics">
+                                    <!-- Metrics will be inserted here -->
+                                </div>
+                                
+                                <div style="text-align: center; margin-top: 1.5rem;">
+                                    <button id="download-btn" class="btn btn-accent">
+                                        <i class="fas fa-download"></i> Download Watermarked Image
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="no-embed-result" style="text-align: center; padding: 2rem;">
+                                <i class="fas fa-image" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+                                <p>Embed a watermark to see results here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="extract-tab">
+                    <div class="watermarking-container">
+                        <div class="upload-area card">
+                            <h3 class="card-title">Upload Watermarked Image</h3>
+                            <div class="form-group">
+                                <div id="extract-dropzone" class="dropzone">
+                                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                                    <p>Drag & drop watermarked image here or click to browse</p>
+                                    <input type="file" id="extract-file-input" accept="image/*" style="display: none;">
+                                    <img id="extract-preview-image" class="preview-image">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Extraction Method</label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="extract-method" value="dct" checked> DCT
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="extract-method" value="dwt"> DWT
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="extract-method" value="hybrid"> Hybrid
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="decrypt-aes" checked>
+                                <label for="decrypt-aes">Decrypt with AES</label>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button id="extract-btn" class="btn btn-secondary">
+                                    <i class="fas fa-unlock"></i> Extract Watermark
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="result-area card">
+                            <h3 class="card-title">Extraction Results</h3>
+                            <div class="spinner" id="extract-spinner"></div>
+                            
+                            <div id="extract-result" style="display: none;">
+                                <div class="result-box">
+                                    <h4 class="result-title">Extracted Watermark</h4>
+                                    <div id="extracted-text" style="display: none;"></div>
+                                    <img id="extracted-image" class="preview-image" style="display: none; margin: 0 auto;">
+                                </div>
+                                
+                                <div class="result-box" id="extract-info" style="margin-top: 1.5rem;">
+                                    <h4 class="result-title">Extraction Details</h4>
+                                    <div id="extract-method-display"></div>
+                                    <div id="extract-status"></div>
+                                </div>
+                            </div>
+                            
+                            <div id="no-extract-result" style="text-align: center; padding: 2rem;">
+                                <i class="fas fa-search" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+                                <p>Extract a watermark to see results here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Page -->
+        <section id="about-page">
+            <div class="section-title">
+                <h2>Our Team</h2>
+                <p>Meet the brilliant minds behind AquaCipher</p>
+            </div>
+
+            <div class="team-members">
+                <div class="team-card">
+                    <img src="static/images/Rhafi.jpeg" alt="Rhafi" class="team-img">
+                    <h3 class="team-name">Rhafi Gunawan Bijaksana</h3>
+                    <p class="team-role">Full Stack Developer</p>
+                    <p>Responsible for end-to-end system development, covering both the backend and frontend of AquaCipher.</p>
+                </div>
+                
+                <div class="team-card">
+                    <img src="static/images/Dikri.jpeg" alt="Rhafi" class="team-img">
+                    <h3 class="team-name">Dikri Asrul Fauzi</h3>
+                    <p class="team-role">Journal Maker</p>
+                    <p>In charge of composing scientific journals related to watermarking technology and cryptography used in this project.</p>
+                </div>
+                
+                <div class="team-card">
+                    <img src="static/images/Dion.jpeg" alt="Rhafi" class="team-img">
+                    <h3 class="team-name">Dionisio Silaen</h3>
+                    <p class="team-role">Final Report Maker</p>
+                    <p>Responsible for compiling the final project report, covering all development aspects of AquaCipher in a structured manner.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">
+                    <i class="fas fa-water"></i>
+                    <span>AquaCipher</span>
+                </div>
+                <p>Advanced Digital Watermarking for Image Authentication</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+                <p class="copyright">&copy; 2025 AquaCipher. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-message">Operation completed successfully</span>
+    </div>
+
+    <script>
+        // Page navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = this.getAttribute('data-page');
+                
+                document.querySelectorAll('[id$="-page"]').forEach(p => {
+                    p.classList.remove('active-page');
+                });
+                
+                document.getElementById(`${page}-page`).classList.add('active-page');
+                
+                document.querySelectorAll('.nav-link').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                window.scrollTo(0, 0);
+            });
+        });
+
+        // Set home as default page
+        document.getElementById('home-page').classList.add('active-page');
+        document.querySelector('.nav-link[data-page="home"]').classList.add('active');
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Watermark type toggle
+        const watermarkType = document.getElementById('watermark-type');
+        const textGroup = document.getElementById('text-watermark-group');
+        const imageGroup = document.getElementById('image-watermark-group');
+        
+        watermarkType.addEventListener('change', function() {
+            if (this.value === 'text') {
+                textGroup.style.display = 'block';
+                imageGroup.style.display = 'none';
+            } else {
+                textGroup.style.display = 'none';
+                imageGroup.style.display = 'block';
+            }
+        });
+
+        // File upload handling for embed tab
+        const embedDropzone = document.getElementById('embed-dropzone');
+        const embedFileInput = document.getElementById('embed-file-input');
+        const embedPreviewImage = document.getElementById('embed-preview-image');
+        
+        setupFileUpload(embedDropzone, embedFileInput, embedPreviewImage);
+        
+        // File upload handling for extract tab
+        const extractDropzone = document.getElementById('extract-dropzone');
+        const extractFileInput = document.getElementById('extract-file-input');
+        const extractPreviewImage = document.getElementById('extract-preview-image');
+        
+        setupFileUpload(extractDropzone, extractFileInput, extractPreviewImage);
+        
+        function setupFileUpload(dropzone, fileInput, previewImage) {
+            dropzone.addEventListener('click', () => fileInput.click());
+            
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // Drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropzone.classList.add('active');
+            }
+            
+            function unhighlight() {
+                dropzone.classList.remove('active');
+            }
+            
+            dropzone.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    fileInput.files = files;
+                    const event = new Event('change');
+                    fileInput.dispatchEvent(event);
+                }
+            }
+        }
+
+        // Show notification
+        function showNotification(message, isSuccess = true) {
+            const notification = document.getElementById('notification');
+            const icon = notification.querySelector('i');
+            const messageEl = document.getElementById('notification-message');
+            
+            messageEl.textContent = message;
+            
+            notification.className = 'notification';
+            notification.classList.add(isSuccess ? 'success' : 'error');
+            icon.className = isSuccess ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Embed watermark
+        const embedBtn = document.getElementById('embed-btn');
+        const embedSpinner = document.getElementById('embed-spinner');
+        const embedResult = document.getElementById('embed-result');
+        const noEmbedResult = document.getElementById('no-embed-result');
+        const watermarkedImage = document.getElementById('watermarked-image');
+        const downloadBtn = document.getElementById('download-btn');
+        const qualityMetrics = document.getElementById('quality-metrics');
+        
+        let currentFilename = '';
+        
+        embedBtn.addEventListener('click', async function() {
+            if (!embedFileInput.files.length) {
+                showNotification('Please upload an image first', false);
+                return;
+            }
+            
+            const watermarkTypeValue = watermarkType.value;
+            let watermarkData = '';
+            
+            if (watermarkTypeValue === 'text') {
+                watermarkData = document.getElementById('watermark-text').value.trim();
+                if (!watermarkData) {
+                    showNotification('Please enter watermark text', false);
+                    return;
+                }
+            } else {
+                const watermarkFile = document.getElementById('watermark-image').files[0];
+                if (!watermarkFile) {
+                    showNotification('Please upload a watermark image', false);
+                    return;
+                }
+                watermarkData = watermarkFile.name; // Simplified for demo
+            }
+            
+            const method = document.querySelector('input[name="method"]:checked').value;
+            const useAes = document.getElementById('use-aes').checked;
+            
+            // Show loading
+            embedSpinner.style.display = 'block';
+            embedResult.style.display = 'none';
+            noEmbedResult.style.display = 'none';
+            
+            try {
+                // Upload the file if not already done
+                if (!currentFilename) {
+                    const formData = new FormData();
+                    formData.append('file', embedFileInput.files[0]);
+                    
+                    const uploadResponse = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const uploadData = await uploadResponse.json();
+                    currentFilename = uploadData.filename;
+                }
+                
+                // Process the image
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        method: method,
+                        watermark: watermarkData,
+                        filename: currentFilename,
+                        action: 'embed',
+                        use_aes: useAes
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    watermarkedImage.src = data.watermarked_image;
+                    currentFilename = data.watermarked_filename;
+                    
+                    // Display metrics
+                    qualityMetrics.innerHTML = `
+                        <div class="metric-card">
+                            <div class="metric-value">${data.metrics.psnr}</div>
+                            <div class="metric-label">PSNR</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">${data.metrics.ssim}</div>
+                            <div class="metric-label">SSIM</div>
+                        </div>
+                    `;
+                    
+                    embedResult.style.display = 'block';
+                    noEmbedResult.style.display = 'none';
+                    
+                    showNotification('Watermark embedded successfully!');
+                } else {
+                    showNotification('Error processing image: ' + (data.error || 'Unknown error'), false);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('An error occurred while processing the image', false);
+            } finally {
+                embedSpinner.style.display = 'none';
+            }
+        });
+        
+        // Extract watermark
+        const extractBtn = document.getElementById('extract-btn');
+        const extractSpinner = document.getElementById('extract-spinner');
+        const extractResult = document.getElementById('extract-result');
+        const noExtractResult = document.getElementById('no-extract-result');
+        const extractedText = document.getElementById('extracted-text');
+        const extractedImage = document.getElementById('extracted-image');
+        const extractMethodDisplay = document.getElementById('extract-method-display');
+        const extractStatus = document.getElementById('extract-status');
+        
+        extractBtn.addEventListener('click', async function() {
+            if (!extractFileInput.files.length) {
+                showNotification('Please upload an image first', false);
+                return;
+            }
+            
+            const method = document.querySelector('input[name="extract-method"]:checked').value;
+            const decryptAes = document.getElementById('decrypt-aes').checked;
+            
+            // Show loading
+            extractSpinner.style.display = 'block';
+            extractResult.style.display = 'none';
+            noExtractResult.style.display = 'none';
+            
+            try {
+                // Upload the file
+                const formData = new FormData();
+                formData.append('file', extractFileInput.files[0]);
+                
+                const uploadResponse = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const uploadData = await uploadResponse.json();
+                const filename = uploadData.filename;
+                
+                // Process the image
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        method: method,
+                        filename: filename,
+                        action: 'extract',
+                        use_aes: decryptAes
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Display extraction method
+                    const methodNames = {
+                        'dct': 'Discrete Cosine Transform (DCT)',
+                        'dwt': 'Discrete Wavelet Transform (DWT)',
+                        'hybrid': 'Hybrid DWT-DCT'
+                    };
+                    
+                    extractMethodDisplay.innerHTML = `
+                        <p><strong>Method:</strong> ${methodNames[method]}</p>
+                        <p><strong>AES Decryption:</strong> ${decryptAes ? 'Enabled' : 'Disabled'}</p>
+                    `;
+                    
+                    // Display extracted data
+                    if (data.is_image) {
+                        extractedImage.src = data.extracted_data;
+                        extractedImage.style.display = 'block';
+                        extractedText.style.display = 'none';
+                        extractStatus.innerHTML = '<p><strong>Type:</strong> Image watermark extracted</p>';
+                    } else {
+                        extractedText.textContent = data.extracted_data;
+                        extractedText.style.display = 'block';
+                        extractedImage.style.display = 'none';
+                        extractStatus.innerHTML = '<p><strong>Type:</strong> Text watermark extracted</p>';
+                    }
+                    
+                    extractResult.style.display = 'block';
+                    noExtractResult.style.display = 'none';
+                    
+                    showNotification('Watermark extracted successfully!');
+                } else {
+                    showNotification('Error processing image: ' + (data.error || 'Unknown error'), false);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('An error occurred while processing the image', false);
+            } finally {
+                extractSpinner.style.display = 'none';
+            }
+        });
+        
+        downloadBtn.addEventListener('click', function() {
+            if (currentFilename) {
+                window.location.href = `/download/${currentFilename}`;
+            } else {
+                showNotification('No watermarked image to download', false);
+            }
+        });
+    </script>
+</body>
+</html>
